@@ -63,6 +63,40 @@ export const resetPasswordTemplate = ({
         font-size: 13px;
         color: #6b7280;
       }
+      .divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 28px 0;
+      }
+      .cta {
+        text-align: center;
+        margin: 20px 0;
+      }
+      .cta a {
+        display: inline-block;
+        padding: 12px 22px;
+        background: #4f46e5;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .link-section {
+        text-align: center;
+        font-size: 13px;
+        margin-top: 10px;
+      }
+      .link-section a {
+        color: #4f46e5;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .about {
+        font-size: 13px;
+        color: #4b5563;
+        line-height: 1.6;
+      }
       .footer {
         padding: 20px;
         text-align: center;
@@ -100,6 +134,37 @@ export const resetPasswordTemplate = ({
           If you did not request a password reset, you can safely ignore this
           email.
         </p>
+
+        <div class="divider"></div>
+
+        <!-- UTKARSH Website -->
+        <div class="cta">
+          <a href="https://bbd-utkarsh.org" target="_blank">
+            Visit Our Official Website
+          </a>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- About BBD University -->
+        <div class="about">
+          <strong>About BBD University</strong><br />
+          Babu Banarasi Das University (BBDU) is a leading private university in
+          Lucknow, committed to excellence in education, innovation, and
+          holistic student development. The UTKARSH initiative reflects the
+          university’s vision to empower students through technology-driven
+          platforms and academic excellence.
+        </div>
+
+        <!-- BBDU Official Website -->
+        <div class="divider"></div>
+
+        <div class="link-section">
+          View BBD Official Website:  
+          <a href="https://bbdu.ac.in" target="_blank">
+            https://bbdu.ac.in
+          </a>
+        </div>
       </div>
 
       <div class="footer">

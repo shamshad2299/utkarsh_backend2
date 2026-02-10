@@ -2,10 +2,11 @@
 import crypto from "crypto";
 import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import { sendEmail } from "../utils/sendEmail.js";
 import { resetPasswordTemplate } from "../services/requestPasswordTemplete.js";
 
 /* ================= REQUEST PASSWORD RESET ================= */
+import { sendEmailBrevo} from "../utils/sendEmail.js";
+
 export const requestPasswordReset = async (req, res) => {
   const { identifier } = req.body || {};
 
@@ -21,7 +22,6 @@ export const requestPasswordReset = async (req, res) => {
     isDeleted: false,
   });
 
-  // user check if present or not 
   if (!user) {
     return res.status(200).json({
       success: true,
@@ -29,7 +29,17 @@ export const requestPasswordReset = async (req, res) => {
     });
   }
 
-  // generate 6-digit code
+  // ⛔ soft rate-limit
+  if (
+    user.resetPasswordExpire &&
+    user.resetPasswordExpire > Date.now() - 2 * 60 * 1000
+  ) {
+    return res.status(429).json({
+      success: false,
+      message: "Please wait before requesting another OTP",
+    });
+  }
+
   const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
 
   const hashedCode = crypto
@@ -37,23 +47,29 @@ export const requestPasswordReset = async (req, res) => {
     .update(resetCode)
     .digest("hex");
 
+  const OTP_EXPIRE_MINUTES = Number(process.env.OTP_EXPIRE_MINUTES) || 10;
+
   user.resetPasswordCode = hashedCode;
-  user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 min
+  user.resetPasswordExpire =
+    Date.now() + OTP_EXPIRE_MINUTES * 60 * 1000;
 
   await user.save({ validateBeforeSave: false });
 
-  // 📧 TODO: replace with email service
- await sendEmail({
-    to: user.email,
-    subject: "Password Reset OTP | BBD UTKARSH 2026",
-    html: resetPasswordTemplate({
-      name: user.name,
-      otp: resetCode,
-      expiryMinutes: 10,
-    }),
-  });
+  try {
+    await sendEmailBrevo({
+      to: user.email,
+      subject: "Password Reset OTP | BBD UTKARSH 2026",
+      html: resetPasswordTemplate({
+        name: user.name,
+        otp: resetCode,
+        expiryMinutes: OTP_EXPIRE_MINUTES,
+      }),
+    });
+  } catch (err) {
+    console.error("Brevo OTP email failed:", err.message);
+  }
 
-  res.status(200).json({
+  return res.status(200).json({
     success: true,
     message: "If user exists, verification code sent",
   });
